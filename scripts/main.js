@@ -130,6 +130,16 @@ FriendlyChat.prototype.showNewRoomModal = function (message) {
         document.getElementById('newMessage').innerHTML = "This room is full, check another one.";
     }
 
+    //Get random 3 empty rooms
+    firebase.database().ref('/rooms/').limitToFirst(3).once('value').then(function (snapshot) {
+
+        for (var r in snapshot.val()) {
+            var url = "<a id='" + r + "'>" + r.toString() + "</a>, ";
+            document.getElementById('rooms').innerHTML += url;
+            document.getElementById(r).setAttribute("href", "./?n=" + r);
+        }
+    });
+
     const dialog = document.getElementById('newRoomModal');
     if (!dialog.showModal) {
         dialogPolyfill.registerDialog(dialog);

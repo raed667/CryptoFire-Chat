@@ -72,21 +72,6 @@
     </main>
 </div>
 
-<dialog id="newRoomModal" class="mdl-dialog">
-    <h4 class="mdl-dialog__title">New room?</h4>
-    <div class="mdl-dialog__content">
-        <p id="newMessage">
-        </p>
-        <p>Join a random room:<br> <span id="rooms"><a href="#">blablah</a>, <a href="#">blablahx</a></span></p>
-        <p>Or create new chat room.</p>
-        <p>
-            <button id="createNewRoom" style="display: block; width: 95%;"
-                    class="mdl-button mdl-js-button mdl-button--colored">New chat
-            </button>
-        </p>
-    </div>
-</dialog>
-
 <dialog id="LoginModal" class="mdl-dialog">
     <h4 class="mdl-dialog__title">Sign-in</h4>
     <div class="mdl-dialog__content">
@@ -111,6 +96,21 @@
         <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--blue">
             <i class="material-icons">account_circle</i>Sign-in with Google
         </button>
+    </div>
+</dialog>
+
+<dialog id="newRoomModal" class="mdl-dialog">
+    <h3 class="mdl-dialog__title">New chat room</h3>
+    <div class="mdl-dialog__content">
+        <p id="newMessage">
+        </p>
+        <p>Join a random room:<br> <span id="rooms"></span></p>
+        <p>Or create new chat room.</p>
+        <p>
+            <button id="createNewRoom" style="display: block; width: 95%;"
+                    class="mdl-button mdl-js-button mdl-button--colored">New chat
+            </button>
+        </p>
     </div>
 </dialog>
 
