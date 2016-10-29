@@ -51,7 +51,6 @@ function FriendlyChat() {
     room = getQueryParams(document.location.search).n;
     if (room != undefined && room.length > 4) {
         this.room.innerHTML = '(' + room + ')';
-
     }
 
     this.initFirebase();
@@ -79,7 +78,6 @@ FriendlyChat.prototype.loadMessages = function () {
     var setMessage = function (data) {
         var val = data.val();
         if (val.name != user.displayName) {
-
             decryptMessage(val, data.key, this);
         }
         this.database.ref('messages/' + data.key).remove();
@@ -123,7 +121,6 @@ function uploadKey(userId, publicKey, encryptedPrivateKey, salt, iv, passwordHas
     });
 }
 
-
 FriendlyChat.prototype.showNewRoomModal = function (message) {
 
     if (message === "full") {
@@ -131,13 +128,16 @@ FriendlyChat.prototype.showNewRoomModal = function (message) {
     }
 
     //Get random 3 empty rooms
-    firebase.database().ref('/rooms/').limitToFirst(3).once('value').then(function (snapshot) {
+    firebase.database().ref('/rooms/').once('value').then(function (snapshot) {
+        let count = 0;
 
-        for (var r in snapshot.val()) {
-            var url = "<a id='" + r + "'>" + r.toString() + "</a>, ";
-            document.getElementById('rooms').innerHTML += url;
-            document.getElementById(r).setAttribute("href", "./?n=" + r);
-        }
+        snapshot.forEach(function (childSnapshot) {
+            if (childSnapshot.val().user1 && !childSnapshot.val().user2) {
+                var url = "<a id='" + childSnapshot.key + "'>" + childSnapshot.key + "</a>, ";
+                document.getElementById('rooms').innerHTML += url;
+                document.getElementById(childSnapshot.key).setAttribute("href", "./?n=" + childSnapshot.key);
+            }
+        });
     });
 
     const dialog = document.getElementById('newRoomModal');
@@ -214,7 +214,7 @@ FriendlyChat.prototype.showPasswordModal = function () {
             if (dbUser === undefined || dbUser.password === undefined) {
                 console.log("new key");
 
-                TwinBcrypt.hash(userPassword, 15, //15
+                TwinBcrypt.hash(userPassword, 15,
                     function (p) {
                         // show progress
                         document.getElementById("passwordProgress").MaterialProgress.setProgress(parseInt(100 * p));
@@ -227,7 +227,6 @@ FriendlyChat.prototype.showPasswordModal = function () {
                         /// Generate keyPair
                         // using "userPassword"
                         createKeyPair(userPassword, user.uid, hash, appScope);
-                        // Close dialog
                     }
                 );
             } else {
@@ -241,7 +240,7 @@ FriendlyChat.prototype.showPasswordModal = function () {
                         // result === true
                         document.getElementById("status").innerHTML = "";
                         if (result === true) {
-                            /// decrypt privateKey
+                            // decrypt privateKey
                             decryptPrivateKey(dbUser.encryptedPrivateKey, userPassword, dbUser.salt, dbUser.iv, dbUser.publicKey, appScope);
                             // Colse dialog
                             dialog.close();
