@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="A front-end template that helps you build fast, modern mobile web apps.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+    <title>CryptoFire Chat - How it works</title>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.teal-red.min.css">
+    <link rel="stylesheet" href="styles/about.css">
+</head>
+<body>
+<div class="demo-layout mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">
+    <header class="demo-header mdl-layout__header mdl-layout__header--scroll mdl-color--grey-100 mdl-color-text--grey-800">
+        <div class="mdl-layout__header-row">
+            <span class="mdl-layout-title">
+               <a href="index.html" class="mdl-button mdl-js-button mdl-button--fab">
+                 <i class="material-icons">chevron_left</i>
+                </a>
+                FireCrypto Chat - How it works</span>
+            <div class="mdl-layout-spacer"></div>
+        </div>
+    </header>
+    <div class="demo-ribbon"></div>
+    <main class="demo-main mdl-layout__content">
+        <div class="demo-container mdl-grid">
+            <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
+            <div class="demo-content mdl-color--white mdl-shadow--4dp content mdl-color-text--grey-800 mdl-cell mdl-cell--8-col">
+                <h3>General</h3>
+                <p>
+                    This is a weekend project that is meant to test the <a target="_blank"
+                                                                           href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">WebCryptoAPI</a>
+                    and <a target="_blank"
+                           href="https://firebase.google.com/">Firebase</a>.
+                    Messages are end-to-end encrypted between the users. Furthermore, messages are destroyed on the
+                    server
+                    as soon as they reach their destination.
+                    <br>
+                    The app is based on the <a href="https://codelabs.developers.google.com/codelabs/firebase-web/">Firebase
+                    Friendly Chat</a> starter project.
+                </p>
+                <p>
+                    Conversations are organized into chat rooms. Each room is identified by a unique name in the URL
+                    that can be shared with another person to start a conversation.
+                    <br>
+                    Each room supports (for now) 2 users:
+                <ul>
+                    <li><b>Host</b>: Creates the room, with a unique id.</li>
+                    <li><b>Guest</b>: Joins a room after receiving a room id (or stumbling onto one).</li>
+                </ul>
+
+                </p>
+                <hr>
+                <h3>Firebase</h3>
+                <p>
+                    I have picked Firebase as a backend for this app because it offered a simple integration for user
+                    profiles
+                    and a real-time database to exchange messages.
+                    <br>
+                    I used to be a Parse fanboy for a long time, and Firebase seemed lacking before, but I'm starting to
+                    see its appeal.
+                    <br>
+                    However, the plan is to move away from centralized solutions to a p22p one
+                    (WebRTC maybe, if I ever manage to get it to work).
+                </p>
+                <hr>
+                <h3>
+                    Why login with Google?
+                </h3>
+                <p>
+                    I needed a way to uniquely identify users, Google is the default integration with Firebase but I
+                    will
+                    add other providers like Github, Twitter and Facebook.
+                    <br>
+                    The chat can function purely on usernames but that would be done later.
+                </p>
+                <h3>Can I use this?</h3>
+                <p>
+                    Use it for fun, experiments and break it!
+                    <br>
+                    This is <b>NOT meant for any serious use!</b> This is just an experiment.
+                </p>
+                <p>
+                    If you find a bug, <a href="mailto:raed.chammam@gamil.com">email me</a>.
+                </p>
+                <p>
+                    If you feel like contributing, the code is <a href="https://github.com/RaedsLab/CryptoFire-Chat">available</a>.
+                </p>
+                <hr>
+            </div>
+        </div>
+        <footer class="demo-footer mdl-mini-footer">
+            <div class="mdl-mini-footer--left-section">
+                <ul class="mdl-mini-footer--link-list">
+                    <li><a href="https://raed.it"><b>Raed Chammam</b></a></li>
+                </ul>
+                All rights reserved to their respective owners (Google Inc / François Pirsch / etc).
+            </div>
+        </footer>
+    </main>
+</div>
+<script>
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-68678399-1', 'auto');
+    ga('send', 'pageview');
+</script>
+<script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+</body>
+</html>

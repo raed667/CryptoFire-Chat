@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Encrypted chat experiment using Firebase and WebCrypto API.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoFire Chat</title>
+    <!-- Web Application Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Material Design Lite -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.cyan-pink.min.css"/>
+    <script defer src="https://code.getmdl.io/1.1.3/material.min.js"></script>
+
+    <!-- App Styling -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+<div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+    <!-- Header section containing logo -->
+    <header class="mdl-layout__header mdl-color-text--white mdl-color--light-blue-700">
+        <div class="mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-grid">
+            <div class="mdl-layout__header-row mdl-cell mdl-cell--12-col mdl-cell--12-col-tablet mdl-cell--12-col-desktop">
+                <h3><i class="material-icons">chat_bubble_outline</i><span style="color: red; text-decoration: double;">CryptoFire</span>
+                    Chat</h3>
+            </div>
+            <div id="user-container">
+                <div hidden id="user-pic"></div>
+                <div hidden id="user-name"></div>
+                <div id="room"></div>
+                <button hidden id="sign-out"
+                        class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--white">
+                    Sign-out
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="mdl-layout__content mdl-color--grey-100">
+        <div id="messages-card-container" class="mdl-cell mdl-cell--12-col mdl-grid">
+            <!-- Messages container -->
+            <div id="messages-card"
+                 class="mdl-card mdl-shadow--2dp mdl-cell mdl-cell--12-col mdl-cell--6-col-tablet mdl-cell--6-col-desktop">
+                <div class="mdl-card__supporting-text mdl-color-text--grey-600">
+                    <div id="messages">
+                        <div class='noselect' id='signInMessage'>Sign-in to be able to view and send messages</div>
+                        <span id="message-filler"></span>
+                    </div>
+                    <form id="message-form" action="#">
+                        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                            <input class="mdl-textfield__input" type="text" id="message">
+                            <label class="mdl-textfield__label" for="message">Message...</label>
+                        </div>
+                        <button id="submit" disabled type="submit"
+                                class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+                            Send
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="must-signin-snackbar" class="mdl-js-snackbar mdl-snackbar">
+                <div class="mdl-snackbar__text"></div>
+                <button class="mdl-snackbar__action" type="button"></button>
+            </div>
+        </div>
+    </main>
+</div>
+
+<dialog id="newRoomModal" class="mdl-dialog">
+    <h4 class="mdl-dialog__title">New room?</h4>
+    <div class="mdl-dialog__content">
+        <p id="newMessage">
+        </p>
+        <p>Join a random room:<br> <span id="rooms"><a href="#">blablah</a>, <a href="#">blablahx</a></span></p>
+        <p>Or create new chat room.</p>
+        <p>
+            <button id="createNewRoom" style="display: block; width: 95%;"
+                    class="mdl-button mdl-js-button mdl-button--colored">New chat
+            </button>
+        </p>
+    </div>
+</dialog>
+
+<dialog id="LoginModal" class="mdl-dialog">
+    <h4 class="mdl-dialog__title">Sign-in</h4>
+    <div class="mdl-dialog__content">
+        <p>
+            Sign in to join the chat room.
+        </p>
+
+        <h4>What is this?</h4>
+        <p>
+            This is a simple chat application based on <a target="_blank"
+                                                          href="https://firebase.google.com/">Firebase</a> and the <a
+                target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto
+            API</a>.
+
+            This is an <a href="https://github.com/RaedsLab/CryptoFire-Chat" target="_blank">open-source</a> end-to-end encryption solution, where the content of
+            messages is completely hidden from the sever.
+        <hr>
+        Check <a href="about.html">How it works</a>
+        </p>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button hidden id="sign-in" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-color-text--blue">
+            <i class="material-icons">account_circle</i>Sign-in with Google
+        </button>
+    </div>
+</dialog>
+
+<dialog id="encryptionModal" class="mdl-dialog">
+    <h4 class="mdl-dialog__title">Encryption</h4>
+    <div class="mdl-dialog__content">
+        <p>
+            This password protects private conversations.
+        </p>
+        <br>
+        <input class="mdl-textfield__input" placeholder="Encryption password" id="encryptionPassword" type="password"/>
+        <br>
+        <p id="status">
+        </p>
+        <div id="passwordProgress" class="mdl-progress mdl-js-progress"></div>
+        <div id="oldPassword">
+            If you forgot your password, you can reset your ID.
+        </div>
+    </div>
+    <div class="mdl-dialog__actions">
+        <button id="passwordSubmitButton" type="button" class="mdl-button">Join</button>
+        <button id="resetIdButton" type="button" class="mdl-button mdl-button--accent">Reset ID</button>
+    </div>
+</dialog>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+<script type="text/javascript" src="bower_components/chance/chance.js"></script>
+<script type="text/javascript" src="bower_components/js-sha512/build/sha512.min.js"></script>
+<script src="scripts/twin-bcrypt.min.js"></script>
+<script>
+    // Initialize Firebase
+    var config = {
+        apiKey: "AIzaSyB9_xpk55KwO3F0EnkCEUKa9raJeQC5WU0",
+        authDomain: "chat-a9892.firebaseapp.com",
+        databaseURL: "https://chat-a9892.firebaseio.com",
+        storageBucket: "chat-a9892.appspot.com",
+        messagingSenderId: "926103648345"
+    };
+    firebase.initializeApp(config);
+
+    (function (i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function () {
+                    (i[r].q = i[r].q || []).push(arguments)
+                }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-68678399-1', 'auto');
+    ga('send', 'pageview');
+
+</script>
+<script src="scripts/util.js"></script>
+<script src="scripts/webCrypto.js"></script>
+<script src="scripts/main.js"></script>
+</body>
+</html>

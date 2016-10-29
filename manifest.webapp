@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "name": "CryptoFire Chat",
+  "launch_path": "/index.html",
+  "description": "Chat with friends using Firebase and WebCrypto",
+  "developer": {
+    "name": "Raed Chammam",
+    "url": "https://raed.it"
+  },
+  "installs_allowed_from": [
+    "*"
+  ],
+  "default_locale": "en",
+  "permissions": {
+  },
+  "locales": {
+    "en": {
+      "name": "CryptoFire",
+      "description": "Chat with friends using Firebase and WebCrypto"
+    }
+  }
+}
