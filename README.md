@@ -1,5 +1,7 @@
-# Firebase: Build a Real Time Web Chat App Codelab - Start code
+# CryptoFire-Chat
 
-This folder contains the starting code for the [Firebase: Build a Real Time Web Chat App Codelab](https://codelabs.developers.google.com/codelabs/firebase-web/).
+A simple chat application (live at https://chat-a9892.firebaseapp.com/) demonstrating end-to-end encryption where the content of messages is completely hidden from the sever.
 
-If you'd like to jump directly to the end and see the finished code head to the [web](../web) directory.
+Its based on Firebase and the Web Crypto API. See https://chat-a9892.firebaseapp.com/about.html for more details on how it works.
+
+
