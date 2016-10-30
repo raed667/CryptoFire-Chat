@@ -122,17 +122,15 @@ function uploadKey(userId, publicKey, encryptedPrivateKey, salt, iv, passwordHas
 }
 
 FriendlyChat.prototype.showNewRoomModal = function (message) {
-
     if (message === "full") {
         document.getElementById('newMessage').innerHTML = "This room is full, check another one.";
     }
 
-    //Get random 3 empty rooms
+    //Get random some empty rooms
     firebase.database().ref('/rooms/').once('value').then(function (snapshot) {
         let count = 0;
-
         snapshot.forEach(function (childSnapshot) {
-            if (childSnapshot.val().user1 && !childSnapshot.val().user2) {
+            if (++count < 4 && (childSnapshot.val().user1 && !childSnapshot.val().user2)) {
                 var url = "<a id='" + childSnapshot.key + "'>" + childSnapshot.key + "</a>, ";
                 document.getElementById('rooms').innerHTML += url;
                 document.getElementById(childSnapshot.key).setAttribute("href", "./?n=" + childSnapshot.key);
@@ -255,6 +253,15 @@ FriendlyChat.prototype.showPasswordModal = function () {
     });
 };
 
+
+document.getElementById("encryptionPassword").addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.keyCode == 13) {
+        document.getElementById("passwordSubmitButton").click();
+    }
+});
+
+
 function showIdentityChangeMessage(oldId, newId) {
     var container = document.createElement('div');
 
@@ -274,6 +281,7 @@ FriendlyChat.prototype.onAuthStateChanged = function (user) {
         // Set the user's profile pic and name.
         this.userPic.style.backgroundImage = 'url(' + profilePicUrl + ')';
         this.userName.textContent = userName;
+        var parentContext = this;
 
         if (room === undefined || room.length < 4) {
             this.showNewRoomModal();
@@ -334,6 +342,7 @@ FriendlyChat.prototype.onAuthStateChanged = function (user) {
 
                     var getOtherPublicKey = function (data) {
                         console.log("GETTING PUBLIC KEY");
+
                         var val = data.val();
                         if (val !== null) {
                             if (val.publicKey !== undefined) {
@@ -342,9 +351,18 @@ FriendlyChat.prototype.onAuthStateChanged = function (user) {
                                 }
                                 theirPublicKey = val.publicKey;
                             }
-
-
                         }
+
+                        if (theirPublicKey === undefined) {
+                            parentContext.submitButton.setAttribute('disabled', 'true');
+                            parentContext.messageInput.setAttribute('disabled', 'true');
+                            parentContext.messageInput.setAttribute("placeholder", 'Waiting for chat partner...');
+                        } else {
+                            parentContext.submitButton.removeAttribute('disabled');
+                            parentContext.messageInput.removeAttribute('disabled');
+                            parentContext.messageInput.setAttribute("placeholder", 'Message...');
+                        }
+
                     }.bind(this);
                     firebase.database().ref('users/' + otherUid).on('value', getOtherPublicKey);
 
