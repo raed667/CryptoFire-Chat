@@ -269,3 +269,14 @@ main, #messages-card {
     min-width: 240px !important;
     width: 50% !important;
 }
+
+.demo-footer {
+    padding-left: 40px;
+    bottom: 0px;
+    position: absolute;
+    width: 100%;
+}
+
+.demo-footer .mdl-mini-footer--link-list a {
+    font-size: 13px;
+}
