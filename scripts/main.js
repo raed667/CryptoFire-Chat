@@ -253,14 +253,12 @@ FriendlyChat.prototype.showPasswordModal = function () {
     });
 };
 
-
 document.getElementById("encryptionPassword").addEventListener("keyup", function (event) {
     event.preventDefault();
     if (event.keyCode == 13) {
         document.getElementById("passwordSubmitButton").click();
     }
 });
-
 
 function showIdentityChangeMessage(oldId, newId) {
     var container = document.createElement('div');

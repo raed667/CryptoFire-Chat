@@ -1,0 +1,22 @@
+{
+  "name": "CryptoFire Chat",
+  "homepage": "https://github.com/RaedsLab/CryptoFire-Chat",
+  "authors": [
+    "raed.chammam@gmail.com"
+  ],
+  "description": "Chat with friends using Firebase and WebCrypto",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "js-sha512": "^0.2.2",
+    "chance": "^1.0.4"
+  }
+}
