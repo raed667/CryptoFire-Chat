@@ -21,7 +21,7 @@ function convertPassphraseToKey(passphraseString, saltBase64) {
             // Firefox currently only supports SHA-1 with PBKDF2
             {name: "PBKDF2", salt: saltBytes, iterations: iterations, hash: "SHA-1"},
             baseKey,
-            {name: "AES-CBC", length: 256}, // Resulting key type we want
+            {name: "AES-GCM", length: 256}, // Resulting key type we want
             true,  // exportable
             ["encrypt", "decrypt"]
         );
@@ -105,7 +105,7 @@ function encryptMessage(inputPlaintext, parent) {
         // Now we need to create a random session key for encrypting
         // the actual plaintext.
         return window.crypto.subtle.generateKey(
-            {name: "AES-CBC", length: 256},
+            {name: "AES-GCM", length: 256},
             true,
             ["encrypt", "decrypt"]
         ).then(function (sessionKey) {
@@ -122,7 +122,7 @@ function encryptMessage(inputPlaintext, parent) {
                 var ivBytes = window.crypto.getRandomValues(new Uint8Array(16));
                 var plaintextBytes = new TextEncoder("utf-8").encode(inputPlaintext);
                 window.crypto.subtle.encrypt(
-                    {name: "AES-CBC", iv: ivBytes}, sessionKey, plaintextBytes
+                    {name: "AES-GCM", iv: ivBytes}, sessionKey, plaintextBytes
                 ).then(function (ciphertextBuffer) {
                     // Build a Blob with the 16-byte IV followed by the ciphertext
                     var toBeSent = [ivBytes, new Uint8Array(ciphertextBuffer)];
@@ -219,14 +219,14 @@ function decryptMessage(val, data, parentScope) {
 
             window.crypto.subtle.importKey(
                 // We can't use the session key until it is in a CryptoKey object
-                "raw", sessionKeyBuffer, {name: "AES-CBC", length: 256}, false, ["decrypt"]
+                "raw", sessionKeyBuffer, {name: "AES-GCM", length: 256}, false, ["decrypt"]
             ).then(function (sessionKey) {
 
                 // Finally, we can read and decrypt the ciphertext file
                 var ciphertextBytes = base64ToByteArray(message.ciphertext);
                 var ivBytes = base64ToByteArray(message.iv);
                 window.crypto.subtle.decrypt(
-                    {name: "AES-CBC", iv: ivBytes}, sessionKey, ciphertextBytes
+                    {name: "AES-GCM", iv: ivBytes}, sessionKey, ciphertextBytes
                 ).then(function (plaintextBuffer) {
 
                     var plaintextDecypted = String.fromCharCode.apply(null, new Uint8Array(plaintextBuffer));
@@ -263,12 +263,12 @@ function encryptPrivateKey(privateKey, passphrase, userId, passwordHash) {
         console.log('Encrypting private key...');
         var plaintextBytes = base64ToByteArray(privateKey);
 
-        /* CALL AES CBC ENCRYPT */
+        /* CALL AES GCM ENCRYPT */
         var iv = window.crypto.getRandomValues(new Uint8Array(16));
         var ivBase64 = byteArrayToBase64(iv);
 
         window.crypto.subtle.encrypt(
-            {name: "AES-CBC", iv: iv},
+            {name: "AES-GCM", iv: iv},
             key,
             plaintextBytes
         ).then(function (ciphertextBuf) {
@@ -309,11 +309,11 @@ function decryptPrivateKey(encryptedPrivateKey, passphrase, base64Salt, ivBase64
 
         var ciphertextBytes = base64ToByteArray(encryptedPrivateKey);
 
-        /// CALL AES CBC ENCRYPT
+        /// CALL AES GCM ENCRYPT
         var iv = base64ToByteArray(ivBase64);
 
         window.crypto.subtle.decrypt(
-            {name: "AES-CBC", iv: iv},
+            {name: "AES-GCM", iv: iv},
             key,
             ciphertextBytes
         ).then(function (plaintextBuf) {
