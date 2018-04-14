@@ -8,15 +8,15 @@ function convertPassphraseToKey(passphraseString, saltBase64) {
     // Loading
     console.log("Generating key...");
 
-    var iterations = 1000000;   // Longer is slower... hence stronger
-    var saltBytes = base64ToByteArray(saltBase64); //
-    var passphraseBytes = stringToByteArray(passphraseString);
+    const iterations = 1000000;   // Longer is slower... hence stronger
+    const saltBytes = base64ToByteArray(saltBase64); //
+    const passphraseBytes = stringToByteArray(passphraseString);
 
     // deriveKey needs to be given a base key. This is just a
     // CryptoKey that represents the starting passphrase.
     return window.crypto.subtle.importKey(
         "raw", passphraseBytes, {name: "PBKDF2"}, false, ["deriveKey"]
-    ).then(function (baseKey) {
+    ).then(baseKey => {
         return window.crypto.subtle.deriveKey(
             // Firefox currently only supports SHA-1 with PBKDF2
             {name: "PBKDF2", salt: saltBytes, iterations: iterations, hash: "SHA-1"},
@@ -25,7 +25,7 @@ function convertPassphraseToKey(passphraseString, saltBase64) {
             true,  // exportable
             ["encrypt", "decrypt"]
         );
-    }).catch(function (err) {
+    }).catch(err => {
         alert("Could not generate a key from passphrase '" + passphraseString + "': " + err.message);
     });
 }
@@ -47,24 +47,24 @@ function createKeyPair(passphrase, userId, passwordHash, parentScope) {
         },
         true,
         ["sign", "verify"]
-    ).then(function (keyPair) {
+    ).then(keyPair => {
 
         // Export public key
         window.crypto.subtle.exportKey("spki", keyPair.publicKey
-        ).then(function (spkiBuffer) {
-            var spkiBytes = new Uint8Array(spkiBuffer);
-            var spkiString = byteArrayToBase64(spkiBytes);
+        ).then(spkiBuffer => {
+            const spkiBytes = new Uint8Array(spkiBuffer);
+            const spkiString = byteArrayToBase64(spkiBytes);
             myKeys.public = spkiString;
-        }).catch(function (err) {
+        }).catch(err => {
             alert("Could not export public key: " + err.message);
         });
 
         // Export Private key
         window.crypto.subtle.exportKey("pkcs8", keyPair.privateKey
-        ).then(function (pkcs8Buffer) {
+        ).then(pkcs8Buffer => {
 
-            var pkcs8Bytes = new Uint8Array(pkcs8Buffer);
-            var pkcs8String = byteArrayToBase64(pkcs8Bytes);
+            const pkcs8Bytes = new Uint8Array(pkcs8Buffer);
+            const pkcs8String = byteArrayToBase64(pkcs8Bytes);
             myKeys.private = pkcs8String;
             console.info("CLEAR (bef)");
             console.debug(pkcs8String);
@@ -75,11 +75,11 @@ function createKeyPair(passphrase, userId, passwordHash, parentScope) {
             /// Encrypt private key and upload
             encryptPrivateKey(myKeys.private, passphrase, userId, passwordHash);
 
-        }).catch(function (err) {
+        }).catch(err => {
             alert("Could not export private key: " + err.message);
         });
 
-    }).catch(function (err) {
+    }).catch(err => {
         alert("Could not generate key pair: " + err.message);
     });
 }
@@ -92,7 +92,7 @@ function createKeyPair(passphrase, userId, passwordHash, parentScope) {
 function encryptMessage(inputPlaintext, parent) {
 
     // var destPublicKey = theirPublicKey; // @temporary @todo
-    var spkiBytes = base64ToByteArray(theirPublicKey);
+    const spkiBytes = base64ToByteArray(theirPublicKey);
 
     // Start by getting the RSA public key for encrypting session key
     window.crypto.subtle.importKey(
@@ -101,33 +101,32 @@ function encryptMessage(inputPlaintext, parent) {
         {name: "RSA-OAEP", hash: "SHA-256"},
         false,
         ["encrypt"]
-    ).then(function (publicKey) {
+    ).then(publicKey => {
         // Now we need to create a random session key for encrypting
         // the actual plaintext.
         return window.crypto.subtle.generateKey(
             {name: "AES-GCM", length: 256},
             true,
             ["encrypt", "decrypt"]
-        ).then(function (sessionKey) {
+        ).then(sessionKey => {
             // We need to do two things with the session key:
             //    Use it to encrypt the selected plaintext file
             //    Encrypt the session key with the public key
 
             // Part 1 - Read the file and encrypt it with the session key.
-            var input = inputPlaintext; //document.getElementById("plaintext").value;
             // console.debug(inputPlaintext);
-            encryptReadFile(input); // See definition below
+            encryptReadFile(inputPlaintext); // See definition below
 
             function encryptReadFile(inputPlaintext) {
-                var ivBytes = window.crypto.getRandomValues(new Uint8Array(16));
-                var plaintextBytes = new TextEncoder("utf-8").encode(inputPlaintext);
+                const ivBytes = window.crypto.getRandomValues(new Uint8Array(16));
+                const plaintextBytes = new TextEncoder("utf-8").encode(inputPlaintext);
                 window.crypto.subtle.encrypt(
                     {name: "AES-GCM", iv: ivBytes}, sessionKey, plaintextBytes
-                ).then(function (ciphertextBuffer) {
+                ).then(ciphertextBuffer => {
                     // Build a Blob with the 16-byte IV followed by the ciphertext
-                    var toBeSent = [ivBytes, new Uint8Array(ciphertextBuffer)];
+                    const toBeSent = [ivBytes, new Uint8Array(ciphertextBuffer)];
                     message = {"iv": byteArrayToBase64(toBeSent[0]), "ciphertext": byteArrayToBase64(toBeSent[1])};
-                }).catch(function (err) {
+                }).catch(err => {
                     alert("Could not encrypt the plaintext: " + err.message);
                 });
             }
@@ -143,15 +142,15 @@ function encryptMessage(inputPlaintext, parent) {
                     {name: "RSA-OAEP"},
                     publicKey, // from closure
                     sessionKeyBuffer
-                ).then(function (encryptedSessionKeyBuffer) {
+                ).then(encryptedSessionKeyBuffer => {
 
-                    var encryptedSessionKeyBytes = new Uint8Array(encryptedSessionKeyBuffer);
-                    var encryptedSessionKeyBase64 = byteArrayToBase64(encryptedSessionKeyBytes);
+                    const encryptedSessionKeyBytes = new Uint8Array(encryptedSessionKeyBuffer);
+                    const encryptedSessionKeyBase64 = byteArrayToBase64(encryptedSessionKeyBytes);
                     message.sessionkey = encryptedSessionKeyBase64;
 
-                    var messageString = JSON.stringify(message);
+                    const messageString = JSON.stringify(message);
 
-                    var currentUser = parent.auth.currentUser;
+                    const currentUser = parent.auth.currentUser;
                     // Add a new message entry to the Firebase Database.
                     parent.database.ref('messages').push({
                         name: currentUser.displayName,
@@ -161,7 +160,7 @@ function encryptMessage(inputPlaintext, parent) {
                         room: room
                     }).then(function () {
                         // Clear message text field and SEND button state.
-                        var user = firebase.auth().currentUser;
+                        const user = firebase.auth().currentUser;
                         parent.displayMessage("me" + Math.random().toString(36).substring(7), user.userName, inputPlaintext, user.photoURL, '');
 
                         FriendlyChat.resetMaterialTextfield(parent.messageInput);
@@ -191,7 +190,7 @@ function encryptMessage(inputPlaintext, parent) {
  * @param parentScope
  */
 function decryptMessage(val, data, parentScope) {
-    var pkcs8Bytes = base64ToByteArray(myKeys.private);
+    const pkcs8Bytes = base64ToByteArray(myKeys.private);
     ///  console.log("my key",myKeys.private);
 
     // We need a CryptoKey object holding the private key to get started
@@ -206,12 +205,12 @@ function decryptMessage(val, data, parentScope) {
         console.log("We're here..");
 
         // Now use the private key to decrypt the session key
-        var message = JSON.parse(val.text);
-        console.log("Recieved");
+        const message = JSON.parse(val.text);
+        console.log("Received");
         console.debug(message);
 
-        var encryptedSessionKeyBase64 = message.sessionkey;  //keyBox.value;
-        var encryptedSessionKeyBytes = base64ToByteArray(encryptedSessionKeyBase64);
+        const encryptedSessionKeyBase64 = message.sessionkey;  //keyBox.value;
+        const encryptedSessionKeyBytes = base64ToByteArray(encryptedSessionKeyBase64);
 
         window.crypto.subtle.decrypt(
             {name: "RSA-OAEP"}, privateKey, encryptedSessionKeyBytes
@@ -223,13 +222,13 @@ function decryptMessage(val, data, parentScope) {
             ).then(function (sessionKey) {
 
                 // Finally, we can read and decrypt the ciphertext file
-                var ciphertextBytes = base64ToByteArray(message.ciphertext);
-                var ivBytes = base64ToByteArray(message.iv);
+                const ciphertextBytes = base64ToByteArray(message.ciphertext);
+                const ivBytes = base64ToByteArray(message.iv);
                 window.crypto.subtle.decrypt(
                     {name: "AES-GCM", iv: ivBytes}, sessionKey, ciphertextBytes
                 ).then(function (plaintextBuffer) {
 
-                    var plaintextDecypted = String.fromCharCode.apply(null, new Uint8Array(plaintextBuffer));
+                    const plaintextDecypted = String.fromCharCode.apply(null, new Uint8Array(plaintextBuffer));
                     console.log("PLAIN :", plaintextDecypted);
                     parentScope.displayMessage(data, val.name, plaintextDecypted, val.photoUrl, val.imageUrl);
 
